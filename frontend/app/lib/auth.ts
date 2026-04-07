@@ -9,6 +9,7 @@ export async function login(email: string, password: string): Promise<void> {
   const data = await apiFetch<TokenResponse>("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
+    skipAuthRedirect: true,
   });
   localStorage.setItem("access_token", data.access_token);
   localStorage.setItem("refresh_token", data.refresh_token);
