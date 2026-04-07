@@ -2,6 +2,9 @@
 # Visual brainstorm companion
 .superpowers/
 
+# Git worktrees
+.worktrees/
+
 # Beads / Dolt files (added by bd init)
 .dolt/
 *.db
