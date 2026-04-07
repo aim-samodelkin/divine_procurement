@@ -1,4 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+function apiBaseUrl(): string {
+  const raw = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").trim();
+  return raw || "http://localhost:8000";
+}
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -19,7 +22,9 @@ export async function apiFetch<T>(path: string, init?: FetchOptions): Promise<T>
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_URL}${path}`, { ...fetchInit, headers });
+  const base = apiBaseUrl().replace(/\/$/, "");
+  const pathPart = path.startsWith("/") ? path : `/${path}`;
+  const res = await fetch(`${base}${pathPart}`, { ...fetchInit, headers });
 
   if (res.status === 401) {
     if (!skipAuthRedirect && typeof window !== "undefined") {
