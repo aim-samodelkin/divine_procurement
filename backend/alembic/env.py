@@ -11,6 +11,7 @@ import app.categories.models  # noqa: F401
 import app.components.models  # noqa: F401
 import app.jobs.models  # noqa: F401
 import app.suppliers.models  # noqa: F401
+import app.supplier_candidates.models  # noqa: F401
 
 config = context.config
 if config.config_file_name:

@@ -29,6 +29,8 @@ services:
   app:
     build: ./backend
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      SERVICE: app
     volumes:
       - ./backend:/app
     ports:
@@ -43,6 +45,8 @@ services:
   worker:
     build: ./backend
     command: arq app.jobs.worker.WorkerSettings
+    environment:
+      SERVICE: worker
     volumes:
       - ./backend:/app
     env_file: .env
@@ -54,7 +58,7 @@ services:
 
   web:
     build: ./frontend
-    command: npm run dev
+    command: npm run dev -- --hostname 0.0.0.0 --port 3000
     volumes:
       - ./frontend:/app
       - /app/node_modules
