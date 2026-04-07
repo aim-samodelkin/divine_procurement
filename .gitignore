@@ -9,3 +9,6 @@
 .dolt/
 *.db
 .beads-credential-key
+
+# Local environment (see .env.example)
+.env
