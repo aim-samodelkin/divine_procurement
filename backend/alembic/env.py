@@ -6,9 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.config import settings
 from app.database import Base
-
-# Import all models so Alembic sees them (they don't exist yet, so skip imports for now)
-# These will be uncommented as models are added in later tasks
+import app.auth.models  # noqa: F401
 
 config = context.config
 if config.config_file_name:

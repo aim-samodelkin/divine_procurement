@@ -8,25 +8,19 @@ from app.main import app
 
 TEST_DATABASE_URL = "postgresql+asyncpg://procurement:procurement@localhost:5432/procurement_test"
 
-test_engine = create_async_engine(TEST_DATABASE_URL)
-TestSessionLocal = async_sessionmaker(test_engine, expire_on_commit=False)
 
-
-@pytest_asyncio.fixture(scope="session", autouse=True)
-async def create_test_db():
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-    await test_engine.dispose()
-
-
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def db() -> AsyncSession:
-    async with TestSessionLocal() as session:
+    engine = create_async_engine(TEST_DATABASE_URL)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
+    async with session_factory() as session:
         yield session
         await session.rollback()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture
