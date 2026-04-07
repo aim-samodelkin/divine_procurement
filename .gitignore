@@ -12,3 +12,12 @@
 
 # Local environment (see .env.example)
 .env
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache / build metadata
+__pycache__/
+*.py[cod]
+*.egg-info/
