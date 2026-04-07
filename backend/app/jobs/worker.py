@@ -1,6 +1,7 @@
 import json
 import uuid
 
+from arq.connections import RedisSettings
 from openai import AsyncOpenAI
 
 from app.config import settings
@@ -64,5 +65,5 @@ Return JSON with exactly these keys:
 
 class WorkerSettings:
     functions = [enrich_component_task]
-    redis_settings_from_url = settings.redis_url
+    redis_settings = RedisSettings.from_dsn(settings.redis_url)
     max_jobs = 5
