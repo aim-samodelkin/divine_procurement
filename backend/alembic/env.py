@@ -8,6 +8,7 @@ from app.config import settings
 from app.database import Base
 import app.auth.models  # noqa: F401
 import app.categories.models  # noqa: F401
+import app.components.models  # noqa: F401
 
 config = context.config
 if config.config_file_name:
