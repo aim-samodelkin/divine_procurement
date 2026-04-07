@@ -27,6 +27,30 @@ async def get_category(db: AsyncSession, category_id: uuid.UUID) -> Category:
     return cat
 
 
+async def validate_parent(db: AsyncSession, category_id: uuid.UUID, new_parent_id: uuid.UUID) -> None:
+    """Validate that setting new_parent_id as parent of category_id won't create a cycle."""
+    if new_parent_id == category_id:
+        raise HTTPException(status_code=422, detail="Category cannot be its own parent")
+
+    parent = await db.get(Category, new_parent_id)
+    if not parent:
+        raise HTTPException(status_code=404, detail="Parent category not found")
+
+    visited: set[uuid.UUID] = set()
+    current_id: uuid.UUID | None = new_parent_id
+    while current_id is not None:
+        if current_id in visited:
+            break
+        visited.add(current_id)
+        if current_id == category_id:
+            raise HTTPException(
+                status_code=422,
+                detail="Cycle detected: new parent is a descendant of this category",
+            )
+        current = await db.get(Category, current_id)
+        current_id = current.parent_id if current else None
+
+
 async def is_leaf(db: AsyncSession, category_id: uuid.UUID) -> bool:
     result = await db.execute(select(Category).where(Category.parent_id == category_id).limit(1))
     return result.scalar_one_or_none() is None

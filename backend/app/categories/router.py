@@ -39,6 +39,8 @@ async def get_category(category_id: uuid.UUID, db: AsyncSession = Depends(get_db
 @router.patch("/{category_id}", response_model=CategoryRead)
 async def update_category(category_id: uuid.UUID, body: CategoryUpdate, db: AsyncSession = Depends(get_db)):
     cat = await service.get_category(db, category_id)
+    if body.parent_id is not None:
+        await service.validate_parent(db, category_id, body.parent_id)
     for k, v in body.model_dump(exclude_none=True).items():
         setattr(cat, k, v)
     await db.commit()
