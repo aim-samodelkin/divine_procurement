@@ -32,3 +32,12 @@ async def client(db):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
         yield c
     app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def auth_client(client, db):
+    from app.auth.service import create_user, create_access_token
+    user = await create_user(db, email="fixture@test.com", password="pass")
+    token = create_access_token({"sub": str(user.id)})
+    client.headers.update({"Authorization": f"Bearer {token}"})
+    return client
