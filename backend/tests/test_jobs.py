@@ -23,6 +23,26 @@ async def test_enqueue_enrichment(auth_client, db):
 
 
 @pytest.mark.asyncio
+async def test_enqueue_discover_suppliers(auth_client, db):
+    from app.categories.schemas import CategoryCreate
+    from app.categories.service import create_category
+    from app.components.schemas import ComponentCreate
+    from app.components.service import create_component
+
+    cat = await create_category(db, CategoryCreate(name="DiscCat"))
+    comp = await create_component(db, ComponentCreate(name_internal="Part", category_id=cat.id))
+
+    mock_pool = AsyncMock()
+    mock_pool.enqueue_job = AsyncMock()
+    mock_pool.aclose = AsyncMock()
+
+    with patch("arq.create_pool", return_value=mock_pool):
+        resp = await auth_client.post(f"/components/{comp.id}/discover-suppliers")
+    assert resp.status_code == 202
+    assert "job_id" in resp.json()
+
+
+@pytest.mark.asyncio
 async def test_get_job_status(auth_client, db):
     from app.jobs.service import create_job
     job = await create_job(db, type="enrich_component", payload={"component_id": "test"})

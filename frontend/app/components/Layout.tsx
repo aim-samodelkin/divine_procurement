@@ -8,6 +8,7 @@ const NAV = [
   { href: "/categories", label: "Категории" },
   { href: "/components", label: "Компоненты" },
   { href: "/suppliers", label: "Поставщики" },
+  { href: "/suppliers/candidates", label: "Кандидаты" },
   { href: "/suppliers/coverage", label: "Покрытие" },
 ];
 

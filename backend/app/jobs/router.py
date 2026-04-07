@@ -29,3 +29,16 @@ async def enqueue_enrichment(component_id: uuid.UUID, db: AsyncSession = Depends
     await pool.enqueue_job("enrich_component_task", component_id=str(component_id), job_id=str(job_record.id))
     await pool.aclose()
     return EnqueueResponse(job_id=job_record.id)
+
+
+@router.post("/components/{component_id}/discover-suppliers", response_model=EnqueueResponse, status_code=status.HTTP_202_ACCEPTED)
+async def enqueue_discover_suppliers(component_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    job_record = await create_job(db, type="discover_suppliers", payload={"component_id": str(component_id)})
+    pool = await arq.create_pool(arq.connections.RedisSettings.from_dsn(settings.redis_url))
+    await pool.enqueue_job(
+        "discover_suppliers_task",
+        component_id=str(component_id),
+        job_id=str(job_record.id),
+    )
+    await pool.aclose()
+    return EnqueueResponse(job_id=job_record.id)

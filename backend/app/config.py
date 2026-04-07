@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
     openrouter_api_key: str = ""
     openrouter_model: str = "anthropic/claude-3.5-haiku"
+    tavily_api_key: str = ""
+    public_supplier_registration_token: str = ""
 
 
 settings = Settings()
