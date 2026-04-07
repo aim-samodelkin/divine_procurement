@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import bcrypt
 from jose import JWTError, jwt
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import User
@@ -33,7 +33,8 @@ def decode_token(token: str) -> dict:
 
 
 async def create_user(db: AsyncSession, email: str, password: str) -> User:
-    user = User(email=email, hashed_password=hash_password(password))
+    email_norm = email.strip().lower()
+    user = User(email=email_norm, hashed_password=hash_password(password))
     db.add(user)
     await db.commit()
     await db.refresh(user)
@@ -41,7 +42,8 @@ async def create_user(db: AsyncSession, email: str, password: str) -> User:
 
 
 async def authenticate_user(db: AsyncSession, email: str, password: str) -> User | None:
-    result = await db.execute(select(User).where(User.email == email))
+    email_norm = email.strip().lower()
+    result = await db.execute(select(User).where(func.lower(User.email) == email_norm))
     user = result.scalar_one_or_none()
     if not user or not verify_password(password, user.hashed_password):
         return None
