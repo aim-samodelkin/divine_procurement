@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "divine_procurement",
+  "project_id": "e67e1724-52a6-4483-b11e-837369316586"
+}
